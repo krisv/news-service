@@ -1,42 +1,34 @@
-# News Service Dockerfile - Multi-stage build for security
-# Build stage - use latest Python 3.12 patch
-FROM python:3.12-alpine AS builder
+# News Service Dockerfile - Red Hat UBI 10 Minimal for enterprise security
+FROM registry.access.redhat.com/ubi10/python-312-minimal:latest
 
-# Update all Alpine packages to latest security patches
-RUN apk update && apk upgrade --no-cache
+# Switch to root for installing dependencies
+USER 0
 
-# Install build dependencies
-RUN apk add --no-cache \
+# Update all packages to latest security patches (microdnf for minimal)
+RUN microdnf update -y && microdnf clean all
+
+# Install build and runtime dependencies
+RUN microdnf install -y \
     gcc \
-    musl-dev \
-    postgresql-dev \
-    linux-headers
+    postgresql-devel \
+    postgresql-libs \
+    python3-devel \
+    wget \
+    && microdnf clean all
 
-# Set working directory
-WORKDIR /app
+# Upgrade pip, setuptools, wheel
+RUN pip install --no-cache-dir --upgrade pip==26.0 setuptools==78.1.1 wheel==0.46.2
 
 # Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip==26.0 setuptools==78.1.1 wheel==0.46.2 && \
-    pip install --no-cache-dir --prefix=/install -r requirements.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Runtime stage - use latest Python 3.12 patch
-FROM python:3.12-alpine
-
-# Update all Alpine packages to latest security patches
-RUN apk update && apk upgrade --no-cache
-
-# Install only runtime dependencies
-RUN apk add --no-cache \
-    libpq \
-    wget \
-    && adduser -D -u 1001 appuser
-
-# Copy installed packages from builder
-COPY --from=builder /install /usr/local
-
-# Upgrade pip, setuptools, wheel in runtime stage as well
-RUN pip install --no-cache-dir --upgrade pip==26.0 setuptools==78.1.1 wheel==0.46.2
+# Remove build dependencies to reduce image size
+RUN microdnf remove -y \
+    gcc \
+    postgresql-devel \
+    python3-devel \
+    && microdnf clean all
 
 # Set working directory
 WORKDIR /app
@@ -48,11 +40,12 @@ COPY config.yaml .
 COPY templates/ templates/
 COPY static/ static/
 
-# Change ownership to non-root user
-RUN chown -R appuser:appuser /app
+# Change ownership to default user (1001) with group ownership for OpenShift
+RUN chown -R 1001:0 /app && \
+    chmod -R g=u /app
 
-# Switch to non-root user
-USER appuser
+# Switch to non-root user (UBI default)
+USER 1001
 
 # Expose port 8080 (OpenShift compatible)
 EXPOSE 8080

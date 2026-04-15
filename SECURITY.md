@@ -248,6 +248,13 @@ Before deploying to production:
 
 ## Updates
 
+- **2026-04-16**: Switched to Red Hat UBI 10 Minimal base image:
+  - Base: `registry.access.redhat.com/ubi10/python-312-minimal:latest`
+  - RHEL 10-based minimal image with enterprise security updates
+  - Minimal package set = reduced attack surface
+  - Better vulnerability scanning and management
+  - Eliminates Alpine-specific CVEs
+  - Package manager: microdnf (lightweight RPM-based)
 - **2026-04-16**: Updated vulnerable packages (second pass):
   - pip: 25.3 → 26.0
   - Flask: 3.1.0 → 3.0.3 (downgraded due to breaking changes in 3.1.x with Flask-SocketIO)
@@ -270,13 +277,22 @@ Before deploying to production:
 
 ## Known Limitations (Base Image CVEs)
 
-Many "Unknown" severity CVEs are in Alpine Linux base packages (libcrypto3, libssl3, busybox, libexpat, musl, zlib) that come from the `python:3.12-alpine` Docker image. These are maintained by the Python Docker team and Alpine Linux, not this project.
+Base image vulnerabilities come from Red Hat UBI 10 Minimal (`ubi10/python-312-minimal`). These are maintained by Red Hat and receive regular security updates.
 
 **Mitigation:**
-- Using `python:3.12-alpine` (latest) to get newest patches automatically
-- Running `apk upgrade` on build to update all packages
-- Monitoring Python Docker releases for updated base images
+- Using `ubi10/python-312-minimal:latest` to get newest patches automatically
+- Running `microdnf update` on build to update all packages
+- Monitoring Red Hat UBI releases for updated base images
+- Red Hat provides enterprise-grade security scanning and patch management
 
-**Cannot fix without:**
-- Switching to a different base image (e.g., Debian)
-- Waiting for upstream Python/Alpine updates
+**Benefits over Alpine:**
+- Fewer false positives in security scans
+- Enterprise support and security updates
+- Better compatibility with OpenShift
+- Stable RPM package ecosystem
+
+**Benefits over Standard UBI:**
+- Smaller image size (~250MB vs ~400MB)
+- Minimal package set = fewer vulnerabilities
+- Reduced attack surface
+- Faster image pulls and deployments

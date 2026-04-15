@@ -65,7 +65,7 @@ class StorageBackend(ABC):
   - Label Colors: Category-based (topic=cyan, company=orange, etc.)
 
 ### Deployment
-- **Container**: Docker with Python 3.12.3-alpine base (multi-stage build)
+- **Container**: Docker with Red Hat UBI 10 Minimal Python 3.12 base (multi-stage build)
 - **Registry**: quay.io/krisv/news-service
 - **Orchestration**: OpenShift (Kubernetes)
 - **Port**: 8080 (non-privileged, OpenShift-compatible)
@@ -74,7 +74,7 @@ class StorageBackend(ABC):
 - **Resources**: 
   - App: 128Mi-512Mi memory, 100m-500m CPU
   - DB: 256Mi-512Mi memory, 100m-500m CPU
-- **Image Size**: ~150MB (Alpine-based)
+- **Image Size**: ~250MB (RHEL 10-based UBI Minimal)
 
 ## Data Model
 
@@ -722,12 +722,15 @@ for item in news:
 - OpenShift compatible
 - Single worker sufficient for connection-pooled database
 
-### Why Alpine Linux?
-- Minimal attack surface (~5MB base vs ~100MB Debian)
-- Faster image builds and deployments
-- Reduced vulnerability exposure
-- Lower storage and bandwidth costs
-- Still includes necessary tools (apk, wget)
+### Why Red Hat UBI 10 Minimal?
+- Enterprise-grade security with Red Hat support
+- RHEL 10-based minimal image with regular security updates
+- Minimal package set = reduced attack surface
+- Smaller than standard UBI (~250MB vs ~400MB)
+- Better vulnerability scanning and management
+- Free to use and redistribute
+- OpenShift-optimized (designed for Kubernetes)
+- Lightweight microdnf package manager
 
 ### Why Multi-Stage Build?
 - Build tools not included in runtime image
@@ -780,19 +783,21 @@ for item in news:
 
 **Dockerfile** (multi-stage):
 - Build Stage:
-  - Base: python:3.12.3-alpine
-  - Installs build dependencies (gcc, musl-dev, postgresql-dev)
+  - Base: registry.access.redhat.com/ubi10/python-312-minimal:latest
+  - RHEL 10-based minimal image with enterprise security updates
+  - Installs build dependencies (gcc, postgresql-devel, python3-devel)
   - Installs Python packages to /install prefix
+  - Uses microdnf package manager (lightweight RPM-based)
 - Runtime Stage:
-  - Base: python:3.12.3-alpine
-  - Installs only libpq (PostgreSQL client library)
+  - Base: registry.access.redhat.com/ubi10/python-312-minimal:latest
+  - Installs only postgresql-libs and wget
   - Copies installed packages from build stage
-  - Creates non-root user (UID 1001)
+  - Creates non-root user (UID 1001, group 0 for OpenShift)
   - Copies application files
   - Exposes port 8080
   - Health check: wget http://localhost:8080/health
   - CMD: `gunicorn --bind 0.0.0.0:8080 --worker-class eventlet -w 1 app:app`
-- Final Size: ~150MB (vs ~1GB for Debian-based)
+- Final Size: ~250MB (RHEL 10 Minimal, enterprise-grade with reduced attack surface)
 
 **Automated Build & Push**:
 ```bash

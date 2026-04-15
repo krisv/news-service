@@ -35,10 +35,10 @@ The service is deployed on OpenShift and ready to use!
 
 ## Technology Stack
 
-- **Backend**: Flask 3.1, Flask-SocketIO 5.4, Gunicorn 23.0, Python 3.12
+- **Backend**: Flask 3.0, Flask-SocketIO 5.5, Gunicorn 23.0, Python 3.12
 - **Database**: PostgreSQL 16 (with in-memory fallback)
 - **Frontend**: Vanilla JavaScript, Tailwind CSS, IBM Plex Mono, Socket.IO client
-- **Container**: Docker (quay.io/krisv/news-service:latest)
+- **Container**: Docker - Red Hat UBI 10 Minimal (quay.io/krisv/news-service:latest)
 - **Deployment**: OpenShift with persistent volumes for DB and backups
 
 ## Quick Start
