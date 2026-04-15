@@ -202,7 +202,16 @@ Creates a new news item and broadcasts it to all connected clients.
 }
 ```
 
+**Error Response**: `409 Conflict` (duplicate source_url)
+```json
+{
+  "error": "A news item with this source URL already exists"
+}
+```
+
 **Authentication Required**: API key must be provided
+
+**Duplicate Detection**: Articles with the same `source_url` cannot be posted twice. If a duplicate is detected, a 409 Conflict error is returned. Articles without a `source_url` are always allowed.
 
 ### Get All News Items
 ```
@@ -484,40 +493,18 @@ On startup, the service initializes with 2 real tech news items:
 
 ## Database Backup & Restore
 
-### Automated Backups
-- **Schedule**: Daily at 2 AM UTC
-- **Format**: Compressed SQL dumps (.sql.gz)
-- **Retention**: 7 days
-- **Storage**: Persistent volume claim (10Gi)
-- **Implementation**: Kubernetes CronJob
+### Approach 1: Local Backup/Restore (Dev/Ops)
 
-### Manual Backup Download
-Download database backup to local machine:
+Scripts for downloading to/restoring from local machine.
 
-**Windows**:
-```bash
-backup-download.bat
-```
+**Download Backup:**
+- Windows: `backup-download.bat`
+- Linux/Mac: `./backup-download.sh`
+- Creates: `backups/news-backup-YYYYMMDD-HHMMSS.sql.gz` (local file)
 
-**Linux/Mac**:
-```bash
-./backup-download.sh
-```
-
-Creates: `backups/news-backup-YYYYMMDD-HHMMSS.sql.gz`
-
-### Manual Restore
-Restore database from local backup:
-
-**Windows**:
-```bash
-backup-restore.bat backups\news-backup-20260416-143022.sql.gz
-```
-
-**Linux/Mac**:
-```bash
-./backup-restore.sh backups/news-backup-20260416-143022.sql.gz
-```
+**Restore from Local:**
+- Windows: `backup-restore.bat backups\news-backup-20260416-143022.sql.gz`
+- Linux/Mac: `./backup-restore.sh backups/news-backup-20260416-143022.sql.gz`
 
 **Process**:
 1. Uploads backup to PostgreSQL pod
@@ -526,7 +513,31 @@ backup-restore.bat backups\news-backup-20260416-143022.sql.gz
 4. Restores from backup
 5. Cleans up temporary files
 
-**Note**: Asks for confirmation before deleting existing data.
+**Use Cases**: Import/export between environments, local development, safekeeping
+
+### Approach 2: OpenShift Backup/Restore (Disaster Recovery)
+
+Automated backups stored in PVC for disaster recovery.
+
+**Automated Backups** (CronJob):
+- **Schedule**: Daily at 2 AM UTC
+- **Format**: Compressed SQL dumps (.sql.gz)
+- **Retention**: 7 days (automatic cleanup)
+- **Storage**: postgres-backups PVC (10Gi)
+- **Location**: `/backups/` in PostgreSQL pod
+
+**Restore from PVC**:
+1. List backups: `oc exec -it <postgres-pod> -- ls -lh /backups/`
+2. Edit `openshift/restore-job.yaml` (set BACKUP_FILE)
+3. Apply: `oc apply -f openshift/restore-job.yaml`
+4. Monitor: `oc logs job/postgres-restore`
+
+**Use Cases**: Disaster recovery, rollback to automated backup, no local access
+
+**Both Approaches**:
+- Delete existing data before restoring
+- Ask for confirmation
+- After restore: restart app pods (`oc delete pod -l app=news-service`)
 
 ## Configuration
 

@@ -28,6 +28,7 @@ The service is deployed on OpenShift and ready to use!
 
 ### Developer Features
 - 🔗 **Source URLs**: Optional links to original articles
+- 🚫 **Duplicate Detection**: Prevents posting the same source URL twice
 - 📊 **Pagination**: Control results with max_results and last_seen parameters
 - 🎯 **Label Categories**: Color-coded by category (topic=cyan, company=orange, etc.)
 - 📦 **Docker Ready**: Optimized multi-stage build with security updates
@@ -157,7 +158,11 @@ X-API-Key: your-api-key-here
   "labels": ["topic:AI", "company:Red Hat", "type:blog-post"]
 }
 ```
-**Note**: `title` and `content` required. `source_url` and `labels` optional. Requires API key.
+**Required**: `title`, `content`  
+**Optional**: `source_url`, `labels`  
+**Authentication**: API key required
+
+**Duplicate Detection**: If `source_url` is provided and already exists, returns `409 Conflict` error. This prevents the same article from being posted multiple times.
 
 #### Delete News Item
 ```bash

@@ -115,6 +115,17 @@ class PostgreSQLStorage(StorageBackend):
         conn = self._get_conn()
         try:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                # Check for duplicate source_url (only if source_url is provided)
+                if source_url:
+                    cur.execute(
+                        "SELECT id, title FROM news_items WHERE source_url = %s LIMIT 1",
+                        (source_url,)
+                    )
+                    existing = cur.fetchone()
+                    if existing:
+                        # Return None to indicate duplicate
+                        return None
+
                 cur.execute(
                     """
                     INSERT INTO news_items (id, title, content, source_url, labels, timestamp)
@@ -345,6 +356,14 @@ class InMemoryStorage(StorageBackend):
 
     def create_news_item(self, title: str, content: str, source_url: Optional[str] = None, labels: Optional[List[str]] = None) -> Dict[str, Any]:
         """Create a new news item"""
+        # Check for duplicate source_url (only if source_url is provided)
+        if source_url:
+            with self.lock:
+                for item in self.news_items.values():
+                    if item.get('source_url') == source_url:
+                        # Return None to indicate duplicate
+                        return None
+
         news_id = str(uuid.uuid4())
         timestamp = self._get_timestamp()
         labels = labels or []

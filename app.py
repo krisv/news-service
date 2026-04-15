@@ -96,6 +96,10 @@ def create_news():
         labels=labels
     )
 
+    # Check for duplicate (None indicates duplicate source_url)
+    if news_item is None:
+        return jsonify({'error': 'A news item with this source URL already exists'}), 409
+
     # Broadcast new news item via WebSocket
     socketio.emit('new_news', news_item)
 

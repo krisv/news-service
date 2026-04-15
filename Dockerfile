@@ -1,6 +1,9 @@
 # News Service Dockerfile - Multi-stage build for security
-# Build stage
-FROM python:3.12.3-alpine AS builder
+# Build stage - use latest Python 3.12 patch
+FROM python:3.12-alpine AS builder
+
+# Update all Alpine packages to latest security patches
+RUN apk update && apk upgrade --no-cache
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -14,15 +17,19 @@ WORKDIR /app
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip==26.0 setuptools==78.1.1 wheel==0.46.2 && \
     pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# Runtime stage
-FROM python:3.12.3-alpine
+# Runtime stage - use latest Python 3.12 patch
+FROM python:3.12-alpine
+
+# Update all Alpine packages to latest security patches
+RUN apk update && apk upgrade --no-cache
 
 # Install only runtime dependencies
 RUN apk add --no-cache \
     libpq \
+    wget \
     && adduser -D -u 1001 appuser
 
 # Copy installed packages from builder

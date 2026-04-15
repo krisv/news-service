@@ -248,6 +248,35 @@ Before deploying to production:
 
 ## Updates
 
+- **2026-04-16**: Updated vulnerable packages (second pass):
+  - pip: 25.3 → 26.0
+  - Flask: 3.1.0 → 3.0.3 (downgraded due to breaking changes in 3.1.x with Flask-SocketIO)
+  - Flask-SocketIO: 5.4.1 → 5.5.1
+  - packaging: added 24.2 (required by eventlet worker)
+  - Added `apk upgrade` in both build and runtime stages for Alpine packages
+  - Using `python:3.12-alpine` (latest patch) instead of pinned version
+  - **Note**: Flask 3.1.x has Low severity CVEs but introduced breaking session changes incompatible with Flask-SocketIO
+- **2026-04-16**: Updated all vulnerable packages (first pass):
+  - pip: 24.0 → 25.3
+  - setuptools: 70.0.0 → 78.1.1
+  - wheel: 0.43.0 → 0.46.2
+  - python-socketio: 5.12.0 → 5.14.0
+  - eventlet: 0.37.0 → 0.40.3
+  - flask-cors: 5.0.0 → 6.0.0
+  - requests: 2.32.3 → 2.33.0
 - **2026-04-16**: Switched to Alpine-based multi-stage build for reduced attack surface
 - **2026-04-16**: Updated to Python 3.12.3 with latest security patches
 - **2026-04-16**: Added health checks to Dockerfile
+
+## Known Limitations (Base Image CVEs)
+
+Many "Unknown" severity CVEs are in Alpine Linux base packages (libcrypto3, libssl3, busybox, libexpat, musl, zlib) that come from the `python:3.12-alpine` Docker image. These are maintained by the Python Docker team and Alpine Linux, not this project.
+
+**Mitigation:**
+- Using `python:3.12-alpine` (latest) to get newest patches automatically
+- Running `apk upgrade` on build to update all packages
+- Monitoring Python Docker releases for updated base images
+
+**Cannot fix without:**
+- Switching to a different base image (e.g., Debian)
+- Waiting for upstream Python/Alpine updates

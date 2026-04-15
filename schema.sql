@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS comments (
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_news_items_timestamp ON news_items(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_news_items_labels ON news_items USING GIN(labels);
+CREATE INDEX IF NOT EXISTS idx_news_items_source_url ON news_items(source_url) WHERE source_url IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_comments_news_id ON comments(news_id);
 CREATE INDEX IF NOT EXISTS idx_comments_timestamp ON comments(timestamp DESC);
 
