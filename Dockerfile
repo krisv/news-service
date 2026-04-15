@@ -35,6 +35,9 @@ RUN apk add --no-cache \
 # Copy installed packages from builder
 COPY --from=builder /install /usr/local
 
+# Upgrade pip, setuptools, wheel in runtime stage as well
+RUN pip install --no-cache-dir --upgrade pip==26.0 setuptools==78.1.1 wheel==0.46.2
+
 # Set working directory
 WORKDIR /app
 
