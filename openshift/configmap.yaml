@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: news-service-config
+  labels:
+    app: news-service
+data:
+  config.yaml: |
+    database:
+      host: postgres
+      port: 5432
+      database: news
+      username: krisv
+      password: ""  # Will be overridden by environment variable
+      min_connections: 1
+      max_connections: 10
+      connection_timeout: 5
+      max_retries: 3
+
+    security:
+      api_key: ""  # Will be overridden by environment variable
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: news-service-secrets
+  labels:
+    app: news-service
+type: Opaque
+stringData:
+  # Database password (matches postgres-credentials secret)
+  DB_PASSWORD: krisv
+
+  # API key for POST /api/news endpoint
+  # Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+  API_KEY: REPLACE_WITH_SECURE_KEY

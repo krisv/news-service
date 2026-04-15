@@ -1,0 +1,65 @@
+# Git
+.git
+.gitignore
+
+# Python
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+
+# Local files
+*.log
+logs/
+article_memory.json
+.api-key
+.quay-config
+*.bak
+backups/
+
+# OpenShift/Kubernetes
+openshift/
+*.yaml
+*.yml
+!requirements.txt
+!config.yaml
+
+# Documentation
+*.md
+!README.md
+
+# Scripts
+*.sh
+*.bat
+
+# Security
+SECURITY.md
+.quay-config
+
+# Development
+*.md
+!README.md

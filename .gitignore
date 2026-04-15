@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+ENV/
+env/
+
+# Database & Config
+config.yaml
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs & Memory
+logs/
+article_memory.json
+
+# Deployment secrets
+.api-key
+.quay-config
+
+# Backup files
+*.bak
+backups/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/

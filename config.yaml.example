@@ -1,0 +1,25 @@
+# News Service Configuration
+# Copy this file to config.yaml and update with your settings
+
+database:
+  # PostgreSQL connection settings
+  # The service will fall back to in-memory storage if connection fails
+  host: localhost
+  port: 5432
+  database: news
+  username: your_username
+  password: your_password
+
+  # Connection pool settings
+  min_connections: 1
+  max_connections: 10
+
+  # Retry settings
+  connection_timeout: 5  # seconds
+  max_retries: 3
+
+security:
+  # API key for POST endpoints (news creation and comments)
+  # Leave empty to disable authentication
+  # Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+  api_key: "your-secure-api-key-here"

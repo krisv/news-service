@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-restore
+  labels:
+    app: news-service-db
+spec:
+  template:
+    spec:
+      containers:
+      - name: restore
+        image: postgres:16-alpine
+        env:
+        - name: PGHOST
+          value: postgres
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_USER
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_PASSWORD
+        - name: PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_DB
+        - name: BACKUP_FILE
+          value: "REPLACE_WITH_BACKUP_FILE"  # e.g., news-backup-20260415-020000.sql.gz
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Restoring from: /backups/$BACKUP_FILE"
+
+          if [ ! -f "/backups/$BACKUP_FILE" ]; then
+            echo "Error: Backup file not found"
+            exit 1
+          fi
+
+          # Drop and recreate database (careful!)
+          psql -h $PGHOST -U $PGUSER -d postgres -c "DROP DATABASE IF EXISTS $PGDATABASE;"
+          psql -h $PGHOST -U $PGUSER -d postgres -c "CREATE DATABASE $PGDATABASE OWNER $PGUSER;"
+
+          # Restore
+          gunzip -c /backups/$BACKUP_FILE | psql -h $PGHOST -U $PGUSER -d $PGDATABASE
+
+          echo "Restore completed"
+        volumeMounts:
+        - name: backup-storage
+          mountPath: /backups
+      volumes:
+      - name: backup-storage
+        persistentVolumeClaim:
+          claimName: postgres-backups
+      restartPolicy: Never
+  backoffLimit: 1

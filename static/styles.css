@@ -1,0 +1,386 @@
+/* News Service - Moltbook-inspired Dark Theme */
+
+/* Custom Properties */
+:root {
+    --color-dark: #1a1a1b;
+    --color-cyan: #00d9ff;
+    --color-cyan-dark: #006680;
+    --color-cyan-light: #66e5ff;
+    --color-orange: #ff6b35;
+    --color-gray-light: #b8b8b8;
+    --color-gray-secondary: #7c7c7c;
+}
+
+/* Base Styles */
+* {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.bg-dark {
+    background-color: var(--color-dark);
+}
+
+.text-cyan {
+    color: var(--color-cyan);
+}
+
+.text-cyan-light {
+    color: var(--color-cyan-light);
+}
+
+.text-gray-light {
+    color: var(--color-gray-light);
+}
+
+.text-gray-secondary {
+    color: var(--color-gray-secondary);
+}
+
+.border-cyan-dark {
+    border-color: var(--color-cyan-dark);
+}
+
+/* News Card Styles */
+.news-card {
+    background: rgba(26, 26, 27, 0.9);
+    border: 1px solid var(--color-cyan-dark);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.1);
+}
+
+.news-card:hover {
+    border-color: var(--color-cyan);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Text Truncation - 3 lines */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Comment Badge */
+.comment-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--color-cyan-dark), var(--color-cyan));
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    min-width: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.comment-badge.pulse-glow {
+    animation: pulseGlow 1s ease-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--color-cyan);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--color-cyan), 0 0 30px var(--color-cyan-light);
+        transform: scale(1.1);
+    }
+}
+
+/* Add Comment Button */
+.add-comment-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, var(--color-cyan-dark), var(--color-cyan));
+    color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+    border: none;
+}
+
+.add-comment-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-cyan), var(--color-cyan-light));
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+    transform: rotate(90deg);
+}
+
+.add-comment-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #666 0%, #888 100%);
+    box-shadow: none;
+}
+
+/* Floating Add Button */
+.floating-add-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    background: linear-gradient(135deg, var(--color-orange), #ff8c5a);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: none;
+    cursor: pointer;
+    animation: floatingPulse 3s ease-in-out infinite;
+}
+
+.floating-add-btn:hover {
+    background: linear-gradient(135deg, #ff8c5a, var(--color-orange));
+    box-shadow: 0 6px 30px rgba(255, 107, 53, 0.6);
+    transform: rotate(90deg) scale(1.1);
+}
+
+.floating-add-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #666 0%, #888 100%);
+}
+
+@keyframes floatingPulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(255, 107, 53, 0.6), 0 0 40px rgba(255, 107, 53, 0.3);
+    }
+}
+
+/* Comments Section */
+.comments-section {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 800px;
+    }
+}
+
+/* Comment Item */
+.comment-item {
+    background-color: rgba(0, 217, 255, 0.05);
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border-left: 3px solid var(--color-cyan);
+    transition: all 0.2s ease;
+}
+
+.comment-item:hover {
+    background-color: rgba(0, 217, 255, 0.1);
+    border-left-color: var(--color-cyan-light);
+}
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-cyan-dark), var(--color-cyan));
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--color-cyan), var(--color-cyan-light));
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: rgba(124, 124, 124, 0.2);
+    color: var(--color-gray-light);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    border: 1px solid var(--color-gray-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(124, 124, 124, 0.3);
+    border-color: var(--color-gray-light);
+    color: white;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.modal-overlay.modal-open {
+    opacity: 1;
+}
+
+/* Modal Content */
+.modal-content {
+    background: var(--color-dark);
+    border: 1px solid var(--color-cyan-dark);
+    border-radius: 0.5rem;
+    max-width: 42rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 50px rgba(0, 217, 255, 0.3);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.modal-open .modal-content {
+    transform: scale(1);
+    animation: modalGlow 2s ease-in-out infinite;
+}
+
+@keyframes modalGlow {
+    0%, 100% {
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 50px rgba(0, 217, 255, 0.4);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-cyan-dark);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--color-cyan-dark);
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Form Inputs */
+input[type="text"],
+textarea {
+    background-color: rgba(26, 26, 27, 0.8);
+    border: 1px solid var(--color-cyan-dark);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--color-cyan);
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+}
+
+input[type="text"]::placeholder,
+textarea::placeholder {
+    color: var(--color-gray-secondary);
+}
+
+/* Scrollbar Styling */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(26, 26, 27, 0.5);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--color-cyan-dark);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--color-cyan);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .news-card {
+        padding: 1rem;
+    }
+
+    .modal-content {
+        margin: 0.5rem;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 1rem;
+    }
+
+    .floating-add-btn {
+        bottom: 1rem;
+        right: 1rem;
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+/* Selection Color */
+::selection {
+    background-color: var(--color-cyan);
+    color: var(--color-dark);
+}
+
+::-moz-selection {
+    background-color: var(--color-cyan);
+    color: var(--color-dark);
+}
+
+/* Loading State */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

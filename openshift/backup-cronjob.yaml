@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  labels:
+    app: news-service-db
+spec:
+  # Run daily at 2 AM
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:16-alpine
+            env:
+            - name: PGHOST
+              value: postgres
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_PASSWORD
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_DB
+            command:
+            - /bin/sh
+            - -c
+            - |
+              BACKUP_FILE="/backups/news-backup-$(date +%Y%m%d-%H%M%S).sql.gz"
+              echo "Creating backup: $BACKUP_FILE"
+              pg_dump -h $PGHOST -U $PGUSER $PGDATABASE | gzip > $BACKUP_FILE
+              echo "Backup completed: $(ls -lh $BACKUP_FILE)"
+
+              # Keep only last 7 days of backups
+              find /backups -name "news-backup-*.sql.gz" -mtime +7 -delete
+
+              echo "Remaining backups:"
+              ls -lh /backups/
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backups
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: postgres-backups
+          restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-backups
+  labels:
+    app: news-service-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
