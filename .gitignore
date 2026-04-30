@@ -19,6 +19,10 @@ config.yaml
 *.sqlite
 *.sqlite3
 
+# Instance configurations (contain sensitive data)
+instances/*/
+!instances/README.md
+
 # Logs & Memory
 logs/
 article_memory.json
